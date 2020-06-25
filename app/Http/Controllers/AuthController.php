@@ -29,28 +29,28 @@ class AuthController extends Controller
 
         // Validation section for registration
         $request->validate([
-            'name' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:8|confirmed'
+            'name'      => 'required|string|max:255|unique:users',
+            'email'     => 'required|string|email|unique:users',
+            'password'  => 'required|string|min:8|confirmed'
         ]);
 
 
         // Create user instace section
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user           = new User();
+        $user->name     = $request->name;
+        $user->email    = $request->email;
         $user->password = bcrypt($request->password);
 
         // Json Response with status
         if ($user->save()) {
             return response()->json([
-                'message' => 'User created successfully!',
-                'status_code' => 201
+                'message'       => 'User created successfully!',
+                'status_code'   => 201
             ], 201);
         } else {
             return response()->json([
-                'message' => 'Some errorr occurred, Please try again',
-                'status_code' => 500
+                'message'       => 'Some errorr occurred, Please try again',
+                'status_code'   => 500
             ], 500);
         }
     }
@@ -65,24 +65,23 @@ class AuthController extends Controller
 
         // Validation section for login
         $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'remember_me' => 'boolean'
+            'email'         => 'required|string|email',
+            'password'      => 'required|string',
+            'remember_me'   => 'boolean'
         ]);
 
         // Credentials for check user data when attempt login
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return response()->json([
-                'message' => 'Invalid username/password',
-                'status_code' => 401
+                'message'       => 'Invalid username/password',
+                'status_code'   => 401
             ], 401);
         }
 
-        $user = $request->user();
+        $user       = $request->user();
 
-        $tokenData = $user->createToken('Personal Access Token', ['user']);
-
-        $token = $tokenData->token;
+        $tokenData  = $user->createToken('Personal Access Token', ['user']);
+        $token      = $tokenData->token;
 
         // Remeber me Section
         if ($request->remember_me) {
@@ -91,17 +90,17 @@ class AuthController extends Controller
 
         if ($token->save()) {
             return response()->json([
-                'user' => $user,
-                'access_token' => $tokenData->accessToken,
-                'token_type' => 'Bearer',
-                'token_scope' => $tokenData->token->scopes[0],
-                'expires_at' => Carbon::parse($tokenData->token->expires_at)->toDateTimeString(),
-                'status_code' => 200
+                'user'          => $user,
+                'access_token'  => $tokenData->accessToken,
+                'token_type'    => 'Bearer',
+                'token_scope'   => $tokenData->token->scopes[0],
+                'expires_at'    => Carbon::parse($tokenData->token->expires_at)->toDateTimeString(),
+                'status_code'   => 200
             ], 200);
         } else {
             return response()->json([
-                'message' => 'Some error occurred, Please try again',
-                'status_code' => 500
+                'message'       => 'Some error occurred, Please try again',
+                'status_code'   => 500
             ], 500);
         }
     }
@@ -116,8 +115,8 @@ class AuthController extends Controller
     public function logout(Request $request) {
         $request->user()->token()->revoke();
         return response()->json([
-            'message' => 'Logout successfully!',
-            'status_code' => 200
+            'message'       => 'Logout successfully!',
+            'status_code'   => 200
         ], 200);
     }
 
@@ -136,8 +135,8 @@ class AuthController extends Controller
 
         // in fail status
         return response()->json([
-            'message' => 'Not loggedin',
-            'status_code' => 500
+            'message'       => 'Not loggedin',
+            'status_code'   => 500
         ], 500);
     }
 }
